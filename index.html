@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Organisation Chart</title>
+      <meta charset="utf-8">
+      <meta name="description" content="Employees Hierarchy">
+      <meta name="author" content="Suraj Pasayat">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <script data-main="js/" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js"></script>
+      <script>require(['js/main.js'])</script>
+   </head>
+   <body ng-controller="orgChartAppController" ng-cloak>
+      <div class="container col-lg-12 col-md-12 col-sm-12 col-xs-12">
+         <button type="button" class="btn btn-primary btn-md" data-toggle="modal" data-target="#employeeForm">
+         <span class="fa fa-plus"></span>{{labels.person}}</button>
+         <div class="modal fade" id="employeeForm">
+            <div class="modal-dialog modal-sm">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal">&times;</button>
+                     <h4 class="modal-title">{{labels.employeeForm}}</h4>
+                  </div>
+                  <div class="modal-body">
+                     <ng-form name="employeeForm" novalidate autocomplete="off">
+                     <div class="form-group">
+                        <label for="firstName">{{labels.firstName}}</label>
+                        <input type="text" class="form-control" name="firstName" id="firstName" ng-model="input.firstName" placeholder="Enter your first name"
+                           ng-class="{ 'invalid-cls' : employeeForm.firstName.$invalid && !employeeForm.firstName.$pristine }"
+                           required>
+                     </div>
+                     <div class="form-group">
+                        <label for="lastName">{{labels.lastName}}</label>
+                        <input type="text" class="form-control" name="lastName" id="lastName" ng-model="input.lastName" placeholder="Enter your last name"
+                           ng-class="{ 'invalid-cls' : employeeForm.lastName.$invalid && !employeeForm.lastName.$pristine }"
+                           required>
+                     </div>
+                     <div class="form-group">
+                        <label for="email">{{labels.email}}</label>
+                        <input type="email" class="form-control" name="email" id="email" ng-model="input.email" placeholder="Enter email" ng-class="{ 'invalid-cls' : employeeForm.email.$invalid && !employeeForm.email.$pristine }"
+                           required>
+                     </div>
+                     <div class="form-group">
+                        <label for="title">{{labels.title}}</label>
+                        <input type="text" class="form-control" name="title" id="title" ng-model="input.title" placeholder="Enter your organisational title"
+                           ng-class="{ 'invalid-cls' : employeeForm.title.$invalid && !employeeForm.title.$pristine }"
+                           required>
+                     </div>
+                     <div class="form-group">
+                        <label for="role">{{labels.role}}</label>
+                        <input type="text" class="form-control" name="role" id="role" ng-model="input.role" placeholder="Enter your organisational role"
+                           ng-class="{ 'invalid-cls' : employeeForm.role.$invalid && !employeeForm.role.$pristine }"
+                           required>
+                     </div>
+                     <div class="form-group">
+                        <label for="social_urls">{{labels.socialAccountsURL}}</label>
+                        <textarea class="form-control" name="social_urls" id="social_urls" ng-model="input.social_urls" placeholder="Enter your social account URLs separated by ;(Facebook, LinkedIn, Twitter only)"
+                           rows="3"></textarea>
+                     </div>
+                     <div class="checkbox">
+                        <label>
+                        <input type="checkbox" ng-model="input.isPrimaryCompany" name="isPrimaryCompany">{{labels.isPrimaryCompany}}
+                        </label>
+                     </div>
+                     </form>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="submit" class="btn btn-default" ng-disabled="employeeForm.$invalid" ng-click="addUser()">{{labels.addUser}}</button>
+                     <button type="button" class="btn btn-default" data-dismiss="modal">{{labels.close}}</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <button type="button" class="btn btn-primary btn-md" ng-click="showModalEmployeeList()">
+         <span class="fa fa-list-alt"></span>{{labels.listOfEmployees}}</button>
+         <div class="modal fade" id="employeeList">
+            <div class="modal-dialog modal-lg">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal">&times;</button>
+                     <span class="modal-title">{{labels.person}}</span>
+                     <form class="navbar-form searchbyNameForm" role="search">
+                        <div class="input-group add-on">
+                           <input class="form-control" placeholder="Search by Value..." ng-keyup="filterEmployee()" name="searchTerm" id="searchTerm"
+                              ng-model="searchTerm" type="text">
+                           <div class="input-group-btn">
+                              <button class="btn btn-default" type="submit">
+                              <i class="glyphicon glyphicon-search"></i>
+                              </button>
+                           </div>
+                        </div>
+                     </form>
+                  </div>
+                  <div class="modal-body">
+                     <table class="table table-bordered table-hover table-condensed" id="employeeListTable">
+                        <thead>
+                           <tr>
+                              <th style="text-align:center">{{labels.name}}</th>
+                              <th style="text-align:center">{{labels.socialLinks}}</th>
+                              <th style="text-align:center">{{labels.title}}</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           <tr ng-repeat="employee in employees">
+                              <td align="center" ng-blur="updateEmployee()">{{employee.firstName}} {{employee.lastName}}</td>
+                              <td align="center">
+                                 <a ng-show="{{employee.social_urls.facebook !== undefined}}" href="{{employee.social_urls.facebook}}" target="_blank">
+                                 <span class="fa fa-facebook"></span>
+                                 </a>
+                                 <a ng-show="{{employee.social_urls.linkedin !== undefined}}" href="{{employee.social_urls.linkedin}}" target="_blank">
+                                 <span class="fa fa-linkedin"></span>
+                                 </a>
+                                 <a ng-show="{{employee.social_urls.twitter!== undefined}}" href="{{employee.social_urls.twitter}}" target="_blank">
+                                 <span class="fa fa-twitter	"></span>
+                                 </a>
+                              </td>
+                              <td align="center" ng-blur="updateEmployee()">{{employee.title}}</td>
+                              <td align="center" style="border:0"><span class="fa fa-edit" ng-click="editDetails()"></span></td>
+                              <td align="center" style="border:0"><span class="fa fa-remove" ng-click="deleteEmployee()"></span></td>
+                           </tr>
+                        </tbody>
+                     </table>
+                     <div style="text-align: right;">
+                        <button type="button" class="btn btn-primary btn-md" ng-click="clearStorage()" title="Clear All Data!"><span class="fa fa-trash"></span></button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <button type="button" class="btn btn-primary btn-md" ng-click="showOrganisationTree()">
+         <span class="fa fa-sitemap"></span>{{labels.organisationStructure}}</button>
+         <div class="modal fade" id="organisationTree">
+            <div class="modal-dialog modal-lg">
+               <div class="modal-content">
+                  <div class="modal-header">
+                  </div>
+                  <div class="modal-body">
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div id="toastMessage">{{toastMessage}}</div>
+   </body>
+</html>
